@@ -48,9 +48,13 @@ code {
   max-width: 250px;
   flex-grow: 1;
   margin-right: 30px;
-  margin-top: 50px;
+  margin-top: 20px;
 }
 
 .restaurantContent {
   min-height: 150px;
+}
+
+.searchbar {
+  margin-top: 30px;
 }
