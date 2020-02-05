@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState } from "react";
 import Firebase from "../../firebase/firebase";
 
 let updatedRestList = [];
@@ -11,17 +11,16 @@ Firebase.getRestaurantList().then(restList => {
 
 const RestaurantList = () => {
   const [searchInput, setSearchInput] = useState("");
-  let restList = useRef({});
-  useEffect(() => {
-    if (!searchInput) {
-      restList.current = updatedRestList;
-    }
-    restList.current = updatedRestList.filter(restaurant => {
-      return restaurant.restName
-        .toUpperCase()
-        .includes(searchInput.toUpperCase());
-    });
+  let restList;
+  if (!searchInput) {
+    restList = updatedRestList;
+  }
+  restList = updatedRestList.filter(restaurant => {
+    return restaurant.restName
+      .toUpperCase()
+      .includes(searchInput.toUpperCase());
   });
+  console.log(restList);
 
   return (
     <div>
@@ -34,7 +33,7 @@ const RestaurantList = () => {
         />
       </div>
       <div className="container restPreviewContainer">
-        {updatedRestList.map(restaurant => (
+        {restList.map(restaurant => (
           <div key={restaurant.restUID} className="card restaurantPreview">
             <div className="card-image">
               <img src={require("../../images/test.jpg")} alt="" />
