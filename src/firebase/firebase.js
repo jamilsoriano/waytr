@@ -62,6 +62,34 @@ class Firebase {
     return user;
   }
 
+  async registerRest(newRestaurant) {
+    const {
+      restName,
+      restStreetAddress,
+      restSuburb,
+      restPostcode,
+      restPhoneNumber,
+      restCuisine,
+      restUID
+    } = newRestaurant;
+
+    this.db
+      .collection("restaurants")
+      .doc()
+      .set({
+        restName,
+        restStreetAddress,
+        restSuburb,
+        restPostcode,
+        restPhoneNumber,
+        restCuisine,
+        restUID
+      })
+      .catch(error => {
+        return error;
+      });
+  }
+
   async getUserData(uid) {
     let userData = {};
     const [value, loading, error] = await useDocument(
@@ -73,7 +101,12 @@ class Firebase {
     if (!loading && value.data()) {
       userData = value.data();
     }
-    return userData;
+    return { userData, loading };
+  }
+  async getRestaurantList() {
+    const restList = await this.db.collection("restaurants").get();
+    return restList;
   }
 }
+
 export default new Firebase();

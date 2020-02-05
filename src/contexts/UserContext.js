@@ -11,13 +11,17 @@ const UserContextProvider = props => {
     lastName: ""
   });
 
+  const [isLoading, setIsLoading] = useState(true);
+
   return (
     <UserContext.Provider
       value={{
         currentUserId,
         setCurrentUserId,
         currentUserData,
-        setCurrentUserData
+        setCurrentUserData,
+        isLoading,
+        setIsLoading
       }}
     >
       {props.children}

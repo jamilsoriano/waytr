@@ -15,14 +15,15 @@ function App() {
     } else if (currentUserId.uid !== null) {
       setCurrentUserId({ uid: null });
     }
-  }
 
-  return (
-    <div className="App wholepage">
-      <Nav />
-      <Routes />
-    </div>
-  );
+    return (
+      <div className="App wholepage">
+        <Nav />
+        <Routes />
+      </div>
+    );
+  }
+  return <div className="loader container center"></div>;
 }
 
 export default App;

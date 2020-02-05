@@ -1,14 +1,10 @@
-import React, { useContext } from "react";
-import { UserContext } from "../../contexts/UserContext";
+import React from "react";
+import ProfileData from "./ProfileData";
 
 const ViewProfile = () => {
-  const { currentUserData } = useContext(UserContext);
-  const { firstName, lastName } = currentUserData;
   return (
-    <div className="container center motto">
-      <h2>
-        Welcome {firstName} {lastName}! :)
-      </h2>
+    <div>
+      <ProfileData />
     </div>
   );
 };

@@ -32,6 +32,7 @@ const LogIn = () => {
             <input
               type="email"
               id="email"
+              required
               onChange={event => setEmail(event.target.value)}
             />
           </div>
@@ -40,6 +41,7 @@ const LogIn = () => {
             <input
               type="password"
               id="password"
+              required
               onChange={event => setPassword(event.target.value)}
             />
           </div>
@@ -47,7 +49,7 @@ const LogIn = () => {
             <button className="btn green lighten-1 z-depth-0">Log In</button>
           </div>
           <div className="center">
-            <a href="signup">Don't have an account?</a>
+            <a href="/signup">Don't have an account?</a>
           </div>
         </form>
       </div>
