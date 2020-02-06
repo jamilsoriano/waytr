@@ -1,27 +1,25 @@
 import React, { useState } from "react";
 import Firebase from "../../firebase/firebase";
 
-let updatedRestList = [];
+let entireRestList = [];
 
 Firebase.getRestaurantList().then(restList => {
   restList.docs.forEach(restaurant => {
-    updatedRestList = [...updatedRestList, restaurant.data()];
+    entireRestList = [...entireRestList, restaurant.data()];
   });
 });
 
 const RestaurantList = () => {
   const [searchInput, setSearchInput] = useState("");
-  let restList;
+  let filteredRestList;
   if (!searchInput) {
-    restList = updatedRestList;
+    filteredRestList = entireRestList;
   }
-  restList = updatedRestList.filter(restaurant => {
+  filteredRestList = entireRestList.filter(restaurant => {
     return restaurant.restName
       .toUpperCase()
       .includes(searchInput.toUpperCase());
   });
-  console.log(restList);
-
   return (
     <div>
       <div className="input-field container searchbar">
@@ -33,19 +31,35 @@ const RestaurantList = () => {
         />
       </div>
       <div className="container restPreviewContainer">
-        {restList.map(restaurant => (
-          <div key={restaurant.restUID} className="card restaurantPreview">
-            <div className="card-image">
-              <img src={require("../../images/test.jpg")} alt="" />
+        {filteredRestList.map(restaurant => (
+          <div
+            key={restaurant.restUID}
+            className="card sticky-action restaurantPreview"
+          >
+            <div className="card-image  waves-effect waves-block waves-light">
+              <img
+                className="activator"
+                src={require("../../images/test.jpg")}
+                alt=""
+              />
             </div>
             <div className="card-content restaurantContent">
-              <span className="card-title">{restaurant.restName}</span>
+              <span className="card-title activator">
+                {restaurant.restName}
+              </span>
+            </div>
+            <div className="card-reveal">
+              <span className="card-title activator">
+                {restaurant.restName}
+              </span>
               <p>
-                {restaurant.restStreetAddress} {restaurant.restSuburb}{" "}
+                {restaurant.restCuisine} Food - located at{" "}
+                {restaurant.restStreetAddress} {restaurant.restSuburb},{" "}
                 {restaurant.restPostcode}
               </p>
+              <p>Contact number: {restaurant.restPhoneNumber}</p>
             </div>
-            <div className="card-action">
+            <div className="card-action center">
               <a href="/" className="green-text">
                 Menu
               </a>
