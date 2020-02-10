@@ -5,11 +5,14 @@ import App from "./App";
 import * as serviceWorker from "./serviceWorker";
 import { BrowserRouter } from "react-router-dom";
 import UserContextProvider from "./contexts/UserContext";
+import RestaurantListContextProvider from "./contexts/RestaurantListContext";
 
 ReactDOM.render(
   <BrowserRouter>
     <UserContextProvider>
-      <App />
+      <RestaurantListContextProvider>
+        <App />
+      </RestaurantListContextProvider>
     </UserContextProvider>
   </BrowserRouter>,
   document.getElementById("root")

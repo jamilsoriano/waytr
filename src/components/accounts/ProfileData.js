@@ -6,7 +6,7 @@ const ProfileData = () => {
   const { firstName, lastName } = currentUserData;
   if (!isLoading) {
     return (
-      <div className="container center motto">
+      <div className="container center">
         <h2>
           Welcome {firstName} {lastName}!
         </h2>

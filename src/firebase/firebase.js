@@ -2,8 +2,9 @@ import firebase from "firebase/app";
 import "firebase/auth";
 import "firebase/firestore";
 import "firebase/storage";
+import "firebase/functions";
 
-import { useDocument } from "react-firebase-hooks/firestore";
+import { useDocument, useCollection } from "react-firebase-hooks/firestore";
 
 var firebaseConfig = {
   apiKey: "AIzaSyBfL5Zv3KtO5T-jF8yPf96LlcKsUgULWws",
@@ -21,6 +22,7 @@ class Firebase {
     firebase.initializeApp(firebaseConfig);
     this.auth = firebase.auth();
     this.db = firebase.firestore();
+    this.functions = firebase.functions();
   }
 
   async loginEmail(email, password) {
@@ -46,6 +48,9 @@ class Firebase {
     const user = await this.auth
       .createUserWithEmailAndPassword(email, password)
       .then(response => {
+        response.user.updateProfile({
+          displayName: firstName
+        });
         this.db
           .collection("users")
           .doc(response.user.uid)
@@ -93,7 +98,7 @@ class Firebase {
   async getUserData(uid) {
     let userData = {};
     const [value, loading, error] = await useDocument(
-      firebase.firestore().doc("users/" + uid)
+      this.db.doc("users/" + uid)
     );
     if (error) {
       console.log(error);
@@ -103,9 +108,21 @@ class Firebase {
     }
     return { userData, loading };
   }
+
   async getRestaurantList() {
-    const restList = await this.db.collection("restaurants").get();
-    return restList;
+    let restCollection = [];
+    const [value, loading, error] = await useCollection(
+      this.db.collection("restaurants")
+    );
+    if (error) {
+      console.log(error);
+    }
+    if (!loading && value) {
+      value.docs.map(document => {
+        return (restCollection = [...restCollection, document.data()]);
+      });
+    }
+    return { restCollection, loading };
   }
 }
 

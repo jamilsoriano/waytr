@@ -6,12 +6,13 @@ const LogIn = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [routeRedirect, setRouteRedirect] = useState();
+  const [errorMessage, setErrorMessage] = useState(null);
 
   const logIn = async event => {
     event.preventDefault();
     let response = await Firebase.loginEmail(email, password);
     if (response.hasOwnProperty("message")) {
-      console.log(response.message);
+      setErrorMessage(response.message);
     } else {
       setRouteRedirect(true);
     }
@@ -48,6 +49,7 @@ const LogIn = () => {
           <div className="input-field center">
             <button className="btn green lighten-1 z-depth-0">Log In</button>
           </div>
+          <p className="error red-text center">{errorMessage}</p>
           <div className="center">
             <a href="/signup">Don't have an account?</a>
           </div>

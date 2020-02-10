@@ -1,40 +1,17 @@
-import React, { useContext } from "react";
+import React from "react";
 import { Link } from "react-router-dom";
 import Firebase from "../../../firebase/firebase";
-import { UserContext } from "../../../contexts/UserContext";
 
-const CustomerNav = () => {
-  const {
-    currentUserId,
-    currentUserData,
-    setCurrentUserData,
-    isLoading,
-    setIsLoading
-  } = useContext(UserContext);
-
+const CustomerNav = user => {
   const SignOut = () => {
     Firebase.signOut();
   };
-  let userData;
-  Firebase.getUserData(currentUserId.uid).then(response => {
-    if (isLoading !== response.loading) {
-      setIsLoading(response.loading);
-    }
-    if (response.userData.hasOwnProperty("firstName")) {
-      userData = response.userData;
-      if (!currentUserData.firstName && !currentUserData.lastName) {
-        setCurrentUserData({
-          firstName: userData.firstName,
-          lastName: userData.lastName
-        });
-      }
-    }
-  });
+
   return (
     <ul className="right">
       <li>
-        <Link to={"/users/" + currentUserId.uid} className="black-text">
-          {currentUserData.firstName}
+        <Link to={"/users/" + user.user.uid} className="black-text">
+          {user.user.displayName}
         </Link>
       </li>
       <li>

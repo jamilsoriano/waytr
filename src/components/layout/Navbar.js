@@ -1,20 +1,17 @@
-import React, { useContext } from "react";
+import React from "react";
 import { Link } from "react-router-dom";
 import CustomerNav from "./navlinks/CustomerNav";
 import LoggedOutNav from "./navlinks/LoggedOutNav";
-import { UserContext } from "../../contexts/UserContext";
 
-const Navbar = () => {
-  const { currentUserId } = useContext(UserContext);
-
+const Navbar = user => {
   let updatedLinks;
-  if (currentUserId.uid) {
-    updatedLinks = <CustomerNav />;
+  if (user.user) {
+    updatedLinks = <CustomerNav user={user.user} />;
   } else {
     updatedLinks = <LoggedOutNav />;
   }
   return (
-    <nav className="nav-wrapper green lighten-3">
+    <nav className="nav-wrapper red lighten-2">
       <div className="container">
         <Link to="/" className="brand-logo left black-text">
           WAYTR

@@ -1,14 +1,13 @@
 import React, { useState } from "react";
 import Firebase from "../../firebase/firebase";
-import { Redirect } from "react-router-dom";
 
-const SignUp = () => {
+const SignUp = props => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
   const [routeRedirect, setRouteRedirect] = useState();
-
+  const [errorMessage, setErrorMessage] = useState(null);
   const newUser = {
     email,
     password,
@@ -19,17 +18,17 @@ const SignUp = () => {
   const signUp = async event => {
     event.preventDefault();
     let response = await Firebase.signUp(newUser);
-    console.log(response);
     if (response.hasOwnProperty("message")) {
-      console.log(response.message);
+      setErrorMessage(response.message);
     } else {
       setRouteRedirect(true);
+      props.history.push("/");
     }
   };
 
   const redirect = routeRedirect;
   if (redirect) {
-    return <Redirect to="/" />;
+    props.history.push("/");
   }
 
   return (
@@ -81,6 +80,7 @@ const SignUp = () => {
             <button className="btn green lighten-1 z-depth-0">
               Create Account
             </button>
+            <p className="error red-text center">{errorMessage}</p>
           </div>
           <div className="center">
             <a href="/login">Already have an account?</a>

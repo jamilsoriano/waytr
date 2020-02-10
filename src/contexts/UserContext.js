@@ -4,7 +4,8 @@ export const UserContext = createContext();
 
 const UserContextProvider = props => {
   const [currentUserId, setCurrentUserId] = useState({
-    uid: null
+    uid: null,
+    admin: false
   });
   const [currentUserData, setCurrentUserData] = useState({
     firstName: "",
