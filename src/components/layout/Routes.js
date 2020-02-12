@@ -7,6 +7,8 @@ import RestaurantListPage from "../restaurants/RestaurantListPage";
 import ViewProfile from "../accounts/ViewProfile";
 import RegisterRestaurant from "../restaurants/RegisterRestaurant";
 import Admin from "../../admin/admin";
+import Order from "../restaurants/Order";
+import Menu from "../restaurants/Menu";
 
 const Routes = () => {
   return (
@@ -22,7 +24,8 @@ const Routes = () => {
         component={RegisterRestaurant}
       ></Route>
       <Route path="/users/:userid" component={ViewProfile}></Route>
-      {/* <Route path="/ordering" component={Order}></Route> */}
+      <Route path="/order" component={Order}></Route>
+      <Route path="/menu/:restid" component={Menu} />
     </Switch>
   );
 };

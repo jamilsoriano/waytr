@@ -124,6 +124,17 @@ class Firebase {
     }
     return { restCollection, loading };
   }
+
+  async getRestaurantMenu(restid) {
+    let menu = {};
+    const [value, loading, error] = await useDocument(
+      this.db.doc("menu/" + restid)
+    );
+    if (!loading && value.data()) {
+      menu = value.data();
+    }
+    return { menu, loading, error };
+  }
 }
 
 export default new Firebase();

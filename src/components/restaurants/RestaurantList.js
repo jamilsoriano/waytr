@@ -1,6 +1,8 @@
 import React, { useState, useContext } from "react";
 import Firebase from "../../firebase/firebase";
 import { RestaurantListContext } from "../../contexts/RestaurantListContext";
+import { Link } from "react-router-dom";
+import { UserContext } from "../../contexts/UserContext";
 
 const RestaurantList = () => {
   let entireRestList = [];
@@ -11,6 +13,8 @@ const RestaurantList = () => {
     isLoading,
     setIsLoading
   } = useContext(RestaurantListContext);
+
+  const { currentUserId } = useContext(UserContext);
 
   Firebase.getRestaurantList().then(response => {
     if (!isLoading && response.restCollection.length > 0) {
@@ -24,6 +28,7 @@ const RestaurantList = () => {
     }
     return entireRestList;
   });
+
   const [searchInput, setSearchInput] = useState("");
   let filteredRestList;
   if (!searchInput) {
@@ -75,24 +80,37 @@ const RestaurantList = () => {
                 <p>Contact number: {restaurant.restPhoneNumber}</p>
               </div>
               <div className="card-action center">
-                <a href="/" className="green-text">
+                <Link to={`/menu/${restaurant.restUID}`} className="green-text">
                   Menu
-                </a>
-                <a href="/" className="green-text">
+                </Link>
+                <Link
+                  to={
+                    !currentUserId.uid
+                      ? `/login`
+                      : `/order?restaurantId=${restaurant.restUID}&restName=${restaurant.restName}&name=${currentUserId.displayName}&uid=${currentUserId.uid}`
+                  }
+                  className="green-text"
+                >
                   Book
-                </a>
-                <a href="/" className="green-text">
+                </Link>
+                <Link
+                  to={
+                    !currentUserId.uid
+                      ? `/login`
+                      : `/order?restaurantId=${restaurant.restUID}&restName=${restaurant.restName}&name=${currentUserId.displayName}&uid=${currentUserId.uid}`
+                  }
+                  className="green-text"
+                >
                   Seated
-                </a>
+                </Link>
               </div>
             </div>
           ))}
         </div>
       </div>
     );
-  } else {
-    return <div className="loader container center"></div>;
   }
+  return <div className="loader container center"></div>;
 };
 
 export default RestaurantList;
