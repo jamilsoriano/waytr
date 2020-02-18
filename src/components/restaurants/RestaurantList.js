@@ -3,8 +3,10 @@ import Firebase from "../../firebase/firebase";
 import { RestaurantListContext } from "../../contexts/RestaurantListContext";
 import { Link } from "react-router-dom";
 import { UserContext } from "../../contexts/UserContext";
+import { Modal } from "react-materialize";
 
 const RestaurantList = () => {
+  const [tableNum, setTableNum] = useState();
   let entireRestList = [];
 
   const {
@@ -30,15 +32,18 @@ const RestaurantList = () => {
   });
 
   const [searchInput, setSearchInput] = useState("");
+
   let filteredRestList;
   if (!searchInput) {
     filteredRestList = restaurantList;
   }
+
   filteredRestList = restaurantList.filter(restaurant => {
     return restaurant.restName
       .toUpperCase()
       .includes(searchInput.toUpperCase());
   });
+
   if (!isLoading && restaurantList) {
     return (
       <div>
@@ -93,16 +98,35 @@ const RestaurantList = () => {
                 >
                   Book
                 </Link>
-                <Link
-                  to={
-                    !currentUserId.uid
-                      ? `/login`
-                      : `/order?restaurantId=${restaurant.restUID}&restName=${restaurant.restName}&name=${currentUserId.displayName}&uid=${currentUserId.uid}`
+                <Modal
+                  className="center-align"
+                  header="Please Enter Your Table Number: "
+                  trigger={
+                    <Link to={"/"} className="green-text" waves="light">
+                      Seated
+                    </Link>
                   }
-                  className="green-text"
                 >
-                  Seated
-                </Link>
+                  <div className="input-field">
+                    <input
+                      required
+                      onChange={event => setTableNum(event.target.value)}
+                      type="number"
+                    ></input>
+                  </div>
+                  <div className="center">
+                    <Link
+                      to={
+                        !currentUserId.uid
+                          ? `/login`
+                          : `/order?restaurantId=${restaurant.restUID}&tableNum=${tableNum}&restName=${restaurant.restName}&name=${currentUserId.displayName}&uid=${currentUserId.uid}`
+                      }
+                      className="btn green"
+                    >
+                      Confirm Table
+                    </Link>
+                  </div>
+                </Modal>
               </div>
             </div>
           ))}

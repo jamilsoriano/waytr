@@ -4,7 +4,7 @@ import { Redirect } from "react-router-dom";
 import uuid from "react-uuid";
 import { useAuthState } from "react-firebase-hooks/auth";
 
-const RegisterRestaurant = () => {
+const RegisterRestaurant = props => {
   const [user, initialising] = useAuthState(Firebase.auth);
   const [restUID] = useState(uuid());
   const [restName, setRestName] = useState("");
@@ -24,6 +24,7 @@ const RegisterRestaurant = () => {
     restPhoneNumber,
     restCuisine
   };
+
   const register = event => {
     event.preventDefault();
     Firebase.registerRest(newRestaurant);
@@ -38,7 +39,9 @@ const RegisterRestaurant = () => {
     if (user) {
       user.getIdTokenResult().then(IdTokenResult => {
         user.admin = IdTokenResult.claims.admin;
+        console.log(user.admin);
         if (!user.admin) {
+          setRouteRedirect(true);
           return <Redirect to="/" />;
         }
       });
@@ -50,7 +53,7 @@ const RegisterRestaurant = () => {
         <div className="container">
           <form onSubmit={register} className="white">
             <h5 className="grey-text text-darken-3 center">
-              Register Your Restaurant
+              Register Your Restaurant (1/2)
             </h5>
             <div className="input-field">
               <label htmlFor="restName">Restaurant Name</label>
@@ -107,9 +110,7 @@ const RegisterRestaurant = () => {
               />
             </div>
             <div className="input-field center">
-              <button className="btn green lighten-1 z-depth-0">
-                Create Account
-              </button>
+              <button className="btn green lighten-1 z-depth-0">Next</button>
             </div>
             <div className="center">
               Already registered?

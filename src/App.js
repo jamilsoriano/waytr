@@ -20,7 +20,7 @@ function App() {
     return (
       <div className="App wholepage">
         <Navbar user={user} />
-        <Routes />
+        <Routes user={user} />
       </div>
     );
   }

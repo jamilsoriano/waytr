@@ -16,18 +16,27 @@ const Menu = props => {
       }
     })
     .catch(error => console.log(error));
-  console.log(menuData);
+
   if (!isLoading && menuData) {
+    if (Object.keys(menuData).length > 0) {
+      return (
+        <div className="container center">
+          <h4>Menu of {menuData.restName}</h4>
+          <div className="card">
+            {menuData.items.map(item => (
+              <div key={menuData.items.indexOf(item)} className="card-content">
+                <p>{menuData.items[menuData.items.indexOf(item)]}</p>
+                <p>{menuData.descriptions[menuData.items.indexOf(item)]}</p>
+                <p>${menuData.prices[menuData.items.indexOf(item)]}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      );
+    }
     return (
       <div className="container center">
-        <h4>Menu of {menuData.restName}</h4>
-        <div className="card">
-          {menuData.items.map(item => (
-            <div key={menuData.items.indexOf(item)}>
-              <p>{item}</p>
-            </div>
-          ))}
-        </div>
+        <h3>Error 404: Unable to find restaurant/menu</h3>
       </div>
     );
   }

@@ -25,7 +25,7 @@ const LogIn = () => {
 
   return (
     <div>
-      <div className="container">
+      <div className="container formcont">
         <form onSubmit={logIn} className="white">
           <h5 className="grey-text text-darken-3 center">Log In</h5>
           <div className="input-field">

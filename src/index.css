@@ -17,8 +17,13 @@ code {
 }
 
 .motto {
-  padding-top: 50px;
+  margin-top: 75px;
   text-align: center;
+  text-shadow: -1px 0 black, 0 1px black, 1px 0 black, 0 -1px black;
+}
+
+.navcolor {
+  background-color: #ff6a7b;
 }
 
 .loader {
@@ -59,4 +64,30 @@ code {
 
 .searchbar {
   margin-top: 30px;
+  background-color: white;
+  opacity: 85%;
+}
+
+.exit {
+  margin-bottom: 0px;
+  margin-top: 50px;
+}
+
+.orderButtons {
+  margin-right: 30px;
+  margin-top: 20px;
+  flex-grow: 1;
+}
+
+.wholepage {
+  background: url(./images/testbg.jpg) no-repeat center center fixed;
+  -webkit-background-size: cover;
+  -moz-background-size: cover;
+  -o-background-size: cover;
+  background-size: cover;
+  min-height: 100vh;
+}
+
+.formcont {
+  background-color: green;
 }

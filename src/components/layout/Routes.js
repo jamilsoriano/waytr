@@ -7,12 +7,14 @@ import RestaurantListPage from "../restaurants/RestaurantListPage";
 import ViewProfile from "../accounts/ViewProfile";
 import RegisterRestaurant from "../restaurants/RegisterRestaurant";
 import Admin from "../../admin/admin";
-import Order from "../restaurants/Order";
+import Order from "../restaurants/order_components/Order";
 import Menu from "../restaurants/Menu";
+import NoMatch from "../homepage/NoMatch";
 
-const Routes = () => {
+const Routes = user => {
   return (
     <Switch>
+      <Route path="/order" component={Order}></Route>
       <Route exact path="/" component={Main}></Route>
       <Route exact path="/login" component={LogIn}></Route>
       <Route exact path="/admin" component={Admin}></Route>
@@ -24,8 +26,8 @@ const Routes = () => {
         component={RegisterRestaurant}
       ></Route>
       <Route path="/users/:userid" component={ViewProfile}></Route>
-      <Route path="/order" component={Order}></Route>
       <Route path="/menu/:restid" component={Menu} />
+      <Route component={NoMatch} />
     </Switch>
   );
 };

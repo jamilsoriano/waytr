@@ -11,23 +11,25 @@ const Navbar = user => {
     updatedLinks = <LoggedOutNav />;
   }
   return (
-    <nav className="nav-wrapper red lighten-2">
-      <div className="container">
-        <Link to="/" className="brand-logo left black-text">
-          WAYTR
-        </Link>
-      </div>
-      <div>
-        <ul className="right">
-          <li>
-            <Link to="/restaurants" className="black-text restaurantNav">
-              Restaurants
-            </Link>
-          </li>
-          {updatedLinks}
-        </ul>
-      </div>
-    </nav>
+    <div className="navbar-fixed">
+      <nav className="nav-wrapper white lighten-2 z-depth-0">
+        <div className="container">
+          <Link to="/" className="brand-logo center black-text">
+            WAYTR
+          </Link>
+        </div>
+        <div>
+          <ul className="right">
+            <li>
+              <Link to="/restaurants" className="black-text restaurantNav">
+                Restaurants
+              </Link>
+            </li>
+            {updatedLinks}
+          </ul>
+        </div>
+      </nav>
+    </div>
   );
 };
 
