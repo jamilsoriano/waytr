@@ -12,8 +12,8 @@ const Order = ({ location }) => {
   const [, setUid] = useState("");
   const [tableNum, setTableNum] = useState("");
   const [message, setMessage] = useState("");
-  const [messages, setMessages] = useState([]);
-  const [prices, setPrices] = useState([]);
+  const [orders, setOrders] = useState([]);
+  const [prices] = useState([]);
   const [menuView, setMenuView] = useState(false);
   const ENDPOINT = "localhost:5000";
 
@@ -40,13 +40,13 @@ const Order = ({ location }) => {
 
   useEffect(() => {
     socket.on("message", message => {
-      setMessages([...messages, message]);
+      setOrders([...orders, message]);
     });
     return () => {
       socket.emit("disconnect");
       socket.off();
     };
-  }, [messages]);
+  }, [orders]);
 
   const sendOrder = event => {
     event.preventDefault();
@@ -57,21 +57,15 @@ const Order = ({ location }) => {
 
   const removeMessage = event => {
     let i = event.target.value;
-    let filteredArray = messages.filter(message => {
-      return message !== messages[i];
+    let filteredArray = orders.filter(message => {
+      return message !== orders[i];
     });
-    setMessages(filteredArray);
+    setOrders(filteredArray);
   };
 
-  const callStaff = event => {
+  const service = event => {
     event.preventDefault();
-    let i = "staff";
-    socket.emit("sendMessage", i, () => setMessage(""));
-  };
-
-  const getBill = event => {
-    event.preventDefault();
-    let i = "bill";
+    let i = event.target.value;
     socket.emit("sendMessage", i, () => setMessage(""));
   };
 
@@ -81,7 +75,12 @@ const Order = ({ location }) => {
   };
 
   let orderView = menuView ? (
-    <MenuOrder toggleMenu={toggleMenu} restid={restaurantId} />
+    <MenuOrder
+      toggleMenu={toggleMenu}
+      restid={restaurantId}
+      setOrders={setOrders}
+      orders={orders}
+    />
   ) : (
     <div className="container">
       <div>
@@ -89,10 +88,10 @@ const Order = ({ location }) => {
           Eating at {restName} Table Number: {tableNum}{" "}
         </h4>
       </div>
-      {messages.map((message, i) => (
+      {orders.map((order, i) => (
         <div key={i}>
           <p>
-            {message.text} - {message.user}{" "}
+            {order.item} {order.quantity} {order.price}
             <button onClick={removeMessage} value={i} className="text">
               x
             </button>
@@ -104,7 +103,7 @@ const Order = ({ location }) => {
         placeholder="Enter your order.."
         onChange={event => setMessage(event.target.value)}
       />
-      <div className="center">Total: {total}</div>
+      <div className="center">Total: ${total}</div>
       <div className="center">
         <button
           onClick={sendOrder}
@@ -119,13 +118,15 @@ const Order = ({ location }) => {
           Menu
         </button>
         <button
-          onClick={getBill}
+          value="bill"
+          onClick={service}
           className="btn orderButtons waves-effect waves-light green"
         >
           Get bill
         </button>
         <button
-          onClick={callStaff}
+          value="staff"
+          onClick={service}
           className="btn orderButtons waves-effect waves-light green"
         >
           Call staff

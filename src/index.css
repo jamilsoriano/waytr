@@ -79,15 +79,21 @@ code {
   flex-grow: 1;
 }
 
-.wholepage {
+/* .wholepage {
   background: url(./images/testbg.jpg) no-repeat center center fixed;
   -webkit-background-size: cover;
   -moz-background-size: cover;
   -o-background-size: cover;
   background-size: cover;
   min-height: 100vh;
-}
+} */
 
 .formcont {
   background-color: green;
+}
+
+.orderQuantity {
+  position: absolute;
+  right: 50px;
+  max-width: 40px;
 }
