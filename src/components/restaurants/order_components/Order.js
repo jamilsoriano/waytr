@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import queryString from "query-string";
 import io from "socket.io-client";
 import MenuOrder from "./MenuOrder";
+import Firebase from "../../../firebase/firebase";
 
 let socket;
 
@@ -9,15 +10,12 @@ const Order = ({ location }) => {
   const [, setName] = useState("");
   const [restaurantId, setRestaurantId] = useState("");
   const [restName, setRestName] = useState("");
-  const [, setUid] = useState("");
+  const [uid, setUid] = useState("");
   const [tableNum, setTableNum] = useState("");
   const [message, setMessage] = useState("");
   const [orders, setOrders] = useState([]);
-  const [prices] = useState([]);
   const [menuView, setMenuView] = useState(false);
   const ENDPOINT = "localhost:5000";
-
-  let total = prices.reduce((partial_sum, a) => partial_sum + a, 0);
 
   useEffect(() => {
     const { restaurantId, tableNum, restName, uid, name } = queryString.parse(
@@ -30,7 +28,11 @@ const Order = ({ location }) => {
     setRestName(restName);
     setUid(uid);
     setTableNum(tableNum);
-    socket.emit("join", { uid, name, restaurantId, restName }, () => {});
+    socket.emit(
+      "join",
+      { uid, name, restaurantId, restName, tableNum },
+      () => {}
+    );
 
     return () => {
       socket.emit("disconnect");
@@ -40,7 +42,10 @@ const Order = ({ location }) => {
 
   useEffect(() => {
     socket.on("message", message => {
-      setOrders([...orders, message]);
+      console.log("staff has been notified");
+    });
+    socket.on("order", order => {
+      setOrders(order);
     });
     return () => {
       socket.emit("disconnect");
@@ -50,23 +55,34 @@ const Order = ({ location }) => {
 
   const sendOrder = event => {
     event.preventDefault();
-    if (message) {
+    if (orders.length > 0) {
+      Firebase.sendOrder({
+        orders,
+        restaurantId,
+        restName,
+        tableNum,
+        uid,
+        orderDateTime: new Date()
+      }).then(() => {
+        setOrders([]);
+      });
       socket.emit("sendMessage", message, () => setMessage(""));
     }
   };
 
   const removeMessage = event => {
     let i = event.target.value;
-    let filteredArray = orders.filter(message => {
-      return message !== orders[i];
+    let updatedOrders = orders.filter(order => {
+      return order !== orders[i];
     });
-    setOrders(filteredArray);
+    setOrders(updatedOrders);
+    socket.emit("sendTempOrder", updatedOrders, () => {});
   };
 
   const service = event => {
     event.preventDefault();
     let i = event.target.value;
-    socket.emit("sendMessage", i, () => setMessage(""));
+    socket.emit("staffRequest", i, () => setMessage(""));
   };
 
   const toggleMenu = event => {
@@ -74,12 +90,15 @@ const Order = ({ location }) => {
     setMenuView(!menuView);
   };
 
+  var total = 0.0;
+  orders.map(order => (total = total + order.price * order.quantity));
+
   let orderView = menuView ? (
     <MenuOrder
       toggleMenu={toggleMenu}
       restid={restaurantId}
-      setOrders={setOrders}
       orders={orders}
+      socket={socket}
     />
   ) : (
     <div className="container">
@@ -91,18 +110,13 @@ const Order = ({ location }) => {
       {orders.map((order, i) => (
         <div key={i}>
           <p>
-            {order.item} {order.quantity} {order.price}
+            x{order.quantity} | ${order.price} | {order.item}
             <button onClick={removeMessage} value={i} className="text">
               x
             </button>
           </p>
         </div>
       ))}
-      <input
-        value={message}
-        placeholder="Enter your order.."
-        onChange={event => setMessage(event.target.value)}
-      />
       <div className="center">Total: ${total}</div>
       <div className="center">
         <button
@@ -139,6 +153,7 @@ const Order = ({ location }) => {
       </div>
     </div>
   );
+
   return orderView;
 };
 

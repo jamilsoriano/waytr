@@ -1,30 +1,57 @@
-import React, { useState } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import Firebase from "../../../firebase/firebase";
 
 const MenuOrder = values => {
-  const { restid, toggleMenu, setOrders } = values;
+  const { restid, toggleMenu, orders, socket } = values;
   const [isLoading, setIsLoading] = useState(true);
   const [menuData, setMenuData] = useState();
   const [tempOrder, setTempOrders] = useState([]);
+  const _isMounted = useRef(true);
+
+  useEffect(() => {
+    return () => {
+      _isMounted.current = false;
+    };
+  }, []);
 
   Firebase.getRestaurantMenu(restid)
     .then(response => {
-      if (isLoading !== response.loading) {
-        setIsLoading(response.loading);
-      }
-      if (!isLoading && !menuData) {
-        setMenuData(response.menu);
+      if (_isMounted.current) {
+        if (isLoading !== response.loading) {
+          setIsLoading(response.loading);
+        }
+        if (!isLoading && !menuData) {
+          setMenuData(response.menu);
+        }
       }
     })
     .catch(error => console.log(error));
 
   const addOrder = event => {
     event.preventDefault();
-    setOrders(tempOrder);
+
+    tempOrder.map(item => {
+      orders.map(order => {
+        if (order.item === item.item) {
+          item.quantity = item.quantity + order.quantity;
+        }
+        return order;
+      });
+      return item;
+    });
+
+    let concat = tempOrder.concat(orders);
+    let updatedOrders = Array.from(
+      new Set(concat.map(order => order.item))
+    ).map(i => {
+      return concat.find(order => order.item === i);
+    });
+
+    if (updatedOrders.length !== 0) {
+      socket.emit("sendTempOrder", updatedOrders, () => {});
+    }
     toggleMenu(event);
   };
-
-  console.log(tempOrder);
 
   if (!isLoading && menuData) {
     if (Object.keys(menuData).length > 0) {
@@ -51,8 +78,10 @@ const MenuOrder = values => {
                           ...newOrder,
                           {
                             item: event.target.id,
-                            quantity: event.target.value,
-                            price: menuData.prices[menuData.items.indexOf(item)]
+                            quantity: +event.target.value,
+                            price: +menuData.prices[
+                              menuData.items.indexOf(item)
+                            ]
                           }
                         ]);
                       } else {

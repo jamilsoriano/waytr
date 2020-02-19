@@ -135,6 +135,24 @@ class Firebase {
     }
     return { menu, loading, error };
   }
+
+  async sendOrder(orderInfo) {
+    const {
+      orders,
+      restaurantId,
+      restName,
+      tableNum,
+      uid,
+      orderDateTime
+    } = orderInfo;
+    this.db
+      .collection("orders")
+      .doc()
+      .set({ orders, restaurantId, restName, tableNum, uid, orderDateTime })
+      .catch(error => {
+        return error;
+      });
+  }
 }
 
 export default new Firebase();
