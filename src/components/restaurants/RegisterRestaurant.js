@@ -4,7 +4,7 @@ import { Redirect } from "react-router-dom";
 import uuid from "react-uuid";
 import { useAuthState } from "react-firebase-hooks/auth";
 
-const RegisterRestaurant = props => {
+const RegisterRestaurant = () => {
   const [user, initialising] = useAuthState(Firebase.auth);
   const [restUID] = useState(uuid());
   const [restName, setRestName] = useState("");
@@ -39,10 +39,8 @@ const RegisterRestaurant = props => {
     if (user) {
       user.getIdTokenResult().then(IdTokenResult => {
         user.admin = IdTokenResult.claims.admin;
-        console.log(user.admin);
         if (!user.admin) {
           setRouteRedirect(true);
-          return <Redirect to="/" />;
         }
       });
     } else {

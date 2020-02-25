@@ -7,15 +7,16 @@ import Firebase from "../../../firebase/firebase";
 let socket;
 
 const Order = ({ location }) => {
-  const [, setName] = useState("");
   const [restaurantId, setRestaurantId] = useState("");
   const [restName, setRestName] = useState("");
   const [uid, setUid] = useState("");
   const [tableNum, setTableNum] = useState("");
-  const [message, setMessage] = useState("");
   const [orders, setOrders] = useState([]);
+  const [dbOrders, setDbOrders] = useState();
   const [menuView, setMenuView] = useState(false);
+  const [orderDocId, setOrderDocId] = useState("");
   const ENDPOINT = "localhost:5000";
+  const currentDateTime = Math.round(new Date().getTime() / 1000);
 
   useEffect(() => {
     const { restaurantId, tableNum, restName, uid, name } = queryString.parse(
@@ -23,11 +24,11 @@ const Order = ({ location }) => {
     );
     socket = io(ENDPOINT);
 
-    setName(name);
     setRestaurantId(restaurantId);
     setRestName(restName);
     setUid(uid);
     setTableNum(tableNum);
+
     socket.emit(
       "join",
       { uid, name, restaurantId, restName, tableNum },
@@ -41,32 +42,80 @@ const Order = ({ location }) => {
   }, [ENDPOINT, location.search]);
 
   useEffect(() => {
-    socket.on("message", message => {
+    let _orders;
+    Firebase.db
+      .collection("orders")
+      .where("tableNum", "==", tableNum)
+      .where("restaurantId", "==", restaurantId)
+      .where("orderCompleted", "==", false)
+      .onSnapshot(snapshot => {
+        snapshot.docChanges().forEach(change => {
+          if (
+            (change.type === "added" || change.type === "modified") &&
+            currentDateTime - change.doc.data().orderDateTime.seconds < 3600
+          ) {
+            _orders = change.doc.data().orders;
+            setOrderDocId(change.doc.id);
+          }
+        });
+        setDbOrders(_orders);
+      });
+  }, [tableNum, restaurantId, uid, currentDateTime]);
+
+  useEffect(() => {
+    socket.on("message", () => {
       console.log("staff has been notified");
     });
     socket.on("order", order => {
       setOrders(order);
     });
+    socket.on("orderSent", () => {
+      setOrders([]);
+    });
     return () => {
       socket.emit("disconnect");
       socket.off();
     };
-  }, [orders]);
-
+  }, []);
   const sendOrder = event => {
     event.preventDefault();
     if (orders.length > 0) {
-      Firebase.sendOrder({
-        orders,
-        restaurantId,
-        restName,
-        tableNum,
-        uid,
-        orderDateTime: new Date()
-      }).then(() => {
+      if (!dbOrders) {
+        Firebase.sendOrder({
+          orders,
+          restaurantId,
+          restName,
+          tableNum,
+          uid,
+          orderDateTime: new Date(),
+          orderCompleted: false
+        }).then(() => {
+          setOrders([]);
+        });
+      } else {
+        orders.map(item => {
+          dbOrders.map(order => {
+            if (order.item === item.item) {
+              item.quantity = item.quantity + order.quantity;
+            }
+            return order;
+          });
+          return item;
+        });
+        let concat = orders.concat(dbOrders);
+        let updatedOrders = Array.from(
+          new Set(concat.map(order => order.item))
+        ).map(i => {
+          return concat.find(order => order.item === i);
+        });
+        Firebase.db
+          .collection("orders")
+          .doc(orderDocId)
+          .update({ orders: updatedOrders });
         setOrders([]);
-      });
-      socket.emit("sendMessage", message, () => setMessage(""));
+      }
+
+      socket.emit("sendOrder", null, () => {});
     }
   };
 
@@ -82,7 +131,15 @@ const Order = ({ location }) => {
   const service = event => {
     event.preventDefault();
     let i = event.target.value;
-    socket.emit("staffRequest", i, () => setMessage(""));
+    socket.emit("staffRequest", i, () => {});
+    if ((i = "bill")) {
+      if (dbOrders) {
+        Firebase.db
+          .collection("orders")
+          .doc(orderDocId)
+          .update({ orderCompleted: true });
+      }
+    }
   };
 
   const toggleMenu = event => {
@@ -90,8 +147,18 @@ const Order = ({ location }) => {
     setMenuView(!menuView);
   };
 
-  var total = 0.0;
-  orders.map(order => (total = total + order.price * order.quantity));
+  var pendingTotal = 0.0;
+  orders.map(
+    order => (pendingTotal = pendingTotal + order.price * order.quantity)
+  );
+  var currentTotal = 0.0;
+
+  if (dbOrders) {
+    dbOrders.map(item => {
+      currentTotal = currentTotal + item.price * item.quantity;
+      return currentTotal;
+    });
+  }
 
   let orderView = menuView ? (
     <MenuOrder
@@ -107,17 +174,33 @@ const Order = ({ location }) => {
           Eating at {restName} Table Number: {tableNum}{" "}
         </h4>
       </div>
-      {orders.map((order, i) => (
-        <div key={i}>
-          <p>
-            x{order.quantity} | ${order.price} | {order.item}
-            <button onClick={removeMessage} value={i} className="text">
-              x
-            </button>
-          </p>
-        </div>
-      ))}
-      <div className="center">Total: ${total}</div>
+      <div className="center">
+        <p className="thick">Orders Pending - Total: ${pendingTotal}</p>
+        {orders.map((order, i) => (
+          <div key={i}>
+            <p>
+              x{order.quantity} | ${order.price} | {order.item}
+              <button onClick={removeMessage} value={i} className="text">
+                x
+              </button>
+            </p>
+          </div>
+        ))}
+      </div>
+      <div className="divider"></div>
+      <div className="center">
+        <p className="thick">Current Orders - Current Total: ${currentTotal}</p>
+        {dbOrders &&
+          dbOrders.map((dbOrder, j) => (
+            <div key={j}>
+              {" "}
+              <p>
+                x{dbOrder.quantity} | ${dbOrder.price} | {dbOrder.item}
+              </p>
+            </div>
+          ))}
+        <p></p>
+      </div>
       <div className="center">
         <button
           onClick={sendOrder}
@@ -144,7 +227,7 @@ const Order = ({ location }) => {
           className="btn orderButtons waves-effect waves-light green"
         >
           Call staff
-        </button>
+        </button>{" "}
       </div>
       <div className="center">
         <a href="/" className="btn green exit">

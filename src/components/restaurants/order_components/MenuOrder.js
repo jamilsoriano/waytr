@@ -39,14 +39,12 @@ const MenuOrder = values => {
       });
       return item;
     });
-
     let concat = tempOrder.concat(orders);
     let updatedOrders = Array.from(
       new Set(concat.map(order => order.item))
     ).map(i => {
       return concat.find(order => order.item === i);
     });
-
     if (updatedOrders.length !== 0) {
       socket.emit("sendTempOrder", updatedOrders, () => {});
     }
@@ -59,16 +57,16 @@ const MenuOrder = values => {
         <div className="container">
           <h4 className="center ">Menu of {menuData.restName}</h4>
           <div className="card">
-            {menuData.items.map(item => (
-              <div key={menuData.items.indexOf(item)} className="card-content">
-                <div>{menuData.items[menuData.items.indexOf(item)]}</div>
+            {menuData.items.map((item, i) => (
+              <div key={i} className="card-content">
+                <div>{menuData.items[i]}</div>
                 <div>
-                  {menuData.descriptions[menuData.items.indexOf(item)]}
+                  {menuData.descriptions[i]}
                   <input
                     type="number"
                     min="0"
                     className="orderQuantity"
-                    id={menuData.items[menuData.items.indexOf(item)]}
+                    id={menuData.items[i]}
                     onChange={event => {
                       let newOrder = tempOrder.filter(item => {
                         return item.item !== event.target.id;
@@ -79,9 +77,8 @@ const MenuOrder = values => {
                           {
                             item: event.target.id,
                             quantity: +event.target.value,
-                            price: +menuData.prices[
-                              menuData.items.indexOf(item)
-                            ]
+                            price: +menuData.prices[i],
+                            status: 0
                           }
                         ]);
                       } else {

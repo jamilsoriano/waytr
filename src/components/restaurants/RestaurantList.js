@@ -1,12 +1,12 @@
 import React, { useState, useContext } from "react";
 import Firebase from "../../firebase/firebase";
 import { RestaurantListContext } from "../../contexts/RestaurantListContext";
-import { Link } from "react-router-dom";
+import { Link, Redirect } from "react-router-dom";
 import { UserContext } from "../../contexts/UserContext";
 import { Modal } from "react-materialize";
 
 const RestaurantList = () => {
-  const [tableNum, setTableNum] = useState();
+  const [tableNum, setTableNum] = useState(1);
   let entireRestList = [];
 
   const {
@@ -43,6 +43,11 @@ const RestaurantList = () => {
       .toUpperCase()
       .includes(searchInput.toUpperCase());
   });
+
+  const handleSubmit = (event, restaurant) => {
+    event.preventDefault();
+    return <Redirect to={"/"} />;
+  };
 
   if (!isLoading && restaurantList) {
     return (
@@ -88,14 +93,7 @@ const RestaurantList = () => {
                 <Link to={`/menu/${restaurant.restUID}`} className="green-text">
                   Menu
                 </Link>
-                <Link
-                  to={
-                    !currentUserId.uid
-                      ? `/login`
-                      : `/order?restaurantId=${restaurant.restUID}&restName=${restaurant.restName}&name=${currentUserId.displayName}&uid=${currentUserId.uid}`
-                  }
-                  className="green-text"
-                >
+                <Link to={`/menu/${restaurant.restUID}`} className="green-text">
                   Book
                 </Link>
                 <Modal
@@ -107,25 +105,28 @@ const RestaurantList = () => {
                     </Link>
                   }
                 >
-                  <div className="input-field">
+                  <form onSubmit={event => handleSubmit(event, restaurant)}>
                     <input
                       required
+                      min={restaurant.restTableMin}
+                      max={restaurant.restTableMax}
+                      defaultValue={restaurant.restTableMin}
                       onChange={event => setTableNum(event.target.value)}
                       type="number"
                     ></input>
-                  </div>
-                  <div className="center">
-                    <Link
-                      to={
-                        !currentUserId.uid
-                          ? `/login`
-                          : `/order?restaurantId=${restaurant.restUID}&tableNum=${tableNum}&restName=${restaurant.restName}&name=${currentUserId.displayName}&uid=${currentUserId.uid}`
-                      }
-                      className="btn green"
-                    >
-                      Confirm Table
-                    </Link>
-                  </div>
+                    <div className="center">
+                      <Link
+                        to={
+                          !currentUserId.uid
+                            ? `/login`
+                            : `/order?restaurantId=${restaurant.restUID}&tableNum=${tableNum}&restName=${restaurant.restName}&name=${currentUserId.displayName}&uid=${currentUserId.uid}`
+                        }
+                        className="btn green"
+                      >
+                        Confirm Table
+                      </Link>
+                    </div>
+                  </form>
                 </Modal>
               </div>
             </div>

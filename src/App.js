@@ -11,7 +11,10 @@ function App() {
   if (!initialising) {
     if (user) {
       user.getIdTokenResult().then(idTokenResult => {
-        user.admin = idTokenResult.claims.admin;
+        user.admin = idTokenResult.claims.admin ? true : false;
+        user.restaurantManager = idTokenResult.claims.restaurantID
+          ? idTokenResult.claims.restaurantID
+          : false;
         setCurrentUserId(user);
       });
     } else if (currentUserId.uid !== null) {

@@ -143,12 +143,21 @@ class Firebase {
       restName,
       tableNum,
       uid,
-      orderDateTime
+      orderDateTime,
+      orderCompleted
     } = orderInfo;
     this.db
       .collection("orders")
       .doc()
-      .set({ orders, restaurantId, restName, tableNum, uid, orderDateTime })
+      .set({
+        orders,
+        restaurantId,
+        restName,
+        tableNum,
+        uid,
+        orderDateTime,
+        orderCompleted
+      })
       .catch(error => {
         return error;
       });

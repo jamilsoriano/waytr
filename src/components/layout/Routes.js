@@ -10,8 +10,10 @@ import Admin from "../../admin/admin";
 import Order from "../restaurants/order_components/Order";
 import Menu from "../restaurants/Menu";
 import NoMatch from "../homepage/NoMatch";
+import RestaurantProfile from "../restaurants/RestaurantProfile";
+import EditMenu from "../restaurants/EditMenu";
 
-const Routes = user => {
+const Routes = () => {
   return (
     <Switch>
       <Route path="/order" component={Order}></Route>
@@ -26,6 +28,11 @@ const Routes = user => {
         component={RegisterRestaurant}
       ></Route>
       <Route path="/users/:userid" component={ViewProfile}></Route>
+      <Route
+        path="/manage_restaurants/:restaurantId"
+        component={RestaurantProfile}
+      ></Route>
+      <Route path="/edit_menu/:restaurantId" component={EditMenu}></Route>
       <Route path="/menu/:restid" component={Menu} />
       <Route component={NoMatch} />
     </Switch>

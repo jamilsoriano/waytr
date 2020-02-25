@@ -23,11 +23,11 @@ const Menu = props => {
         <div className="container center">
           <h4>Menu of {menuData.restName}</h4>
           <div className="card">
-            {menuData.items.map(item => (
-              <div key={menuData.items.indexOf(item)} className="card-content">
-                <p>{menuData.items[menuData.items.indexOf(item)]}</p>
-                <p>{menuData.descriptions[menuData.items.indexOf(item)]}</p>
-                <p>${menuData.prices[menuData.items.indexOf(item)]}</p>
+            {menuData.items.map((item, i) => (
+              <div key={i} className="card-content">
+                <p>{menuData.items[i]}</p>
+                <p>{menuData.descriptions[i]}</p>
+                <p>${menuData.prices[i]}</p>
               </div>
             ))}
           </div>

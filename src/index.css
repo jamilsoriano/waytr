@@ -6,8 +6,7 @@ body {
 }
 
 code {
-  font-family: source-code-pro, Menlo, Monaco, Consolas, "Courier New",
-    monospace;
+  font-family: "Raleway", sans-serif;
 }
 
 .navuser {
@@ -19,7 +18,7 @@ code {
 .motto {
   margin-top: 75px;
   text-align: center;
-  text-shadow: -1px 0 black, 0 1px black, 1px 0 black, 0 -1px black;
+  /* text-shadow: -1px 0 black, 0 1px black, 1px 0 black, 0 -1px black; */
 }
 
 .navcolor {
@@ -76,17 +75,18 @@ code {
 .orderButtons {
   margin-right: 30px;
   margin-top: 20px;
+  margin-bottom: 30px;
   flex-grow: 1;
 }
 
-.wholepage {
+/* .wholepage {
   background: url(./images/testbg.jpg) no-repeat center center fixed;
   -webkit-background-size: cover;
   -moz-background-size: cover;
   -o-background-size: cover;
   background-size: cover;
   min-height: 100vh;
-}
+} */
 
 .formcont {
   background-color: green;
@@ -96,4 +96,12 @@ code {
   position: absolute;
   right: 50px;
   max-width: 40px;
+}
+
+.thick {
+  font-weight: bold;
+}
+
+.break {
+  margin-top: 100px;
 }
